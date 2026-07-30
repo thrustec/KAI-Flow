@@ -220,6 +220,7 @@ const isProviderNode = (node?: Node): boolean => {
     "WebScraperNode", "WebScraper",
     "StringInputNode",
     "MarkItDownTool",
+    "MySQLTool",
   ];
   return providerTypes.some((type) =>
     node.type?.includes(type) ||

@@ -1,0 +1,66 @@
+{
+  "id": "mysql-test-05-agent-readonly",
+  "category": "ai-ml",
+  "created_at": "2026-07-29T00:00:00.000Z",
+  "name": "MySQL Test 05 - Read-only Agent Tool",
+  "description": "Tests the separate MySQL Tool node, schema discovery, SELECT access, table allowlisting, and write rejection. Select a MySQL credential and an OpenAI credential before chatting.",
+  "colorFrom": "from-purple-600",
+  "colorTo": "to-cyan-700",
+  "icon": { "name": "mysql", "path": "icons/mysql.svg", "alt": "MySQL" },
+  "flow_data": {
+    "nodes": [
+      { "id": "StartNode__mysql_test_05_start", "data": { "name": "start_mysql_agent_readonly" }, "type": "StartNode", "position": { "x": 180, "y": 280 } },
+      {
+        "id": "Agent__mysql_test_05_agent",
+        "data": {
+          "name": "mysql_readonly_agent",
+          "agent_type": "react",
+          "user_prompt_template": "${{input}}",
+          "system_prompt": "You are a MySQL verification agent. Always use the connected MySQL tool for database questions. If schema is unknown, run SHOW TABLES and SHOW COLUMNS before SELECT. Never invent names. Explain that writes are blocked when the tool returns a read-only error.",
+          "max_iterations": 10,
+          "temperature": 0.1,
+          "enable_memory": false,
+          "enable_tools": true,
+          "_active_optional_fields": []
+        },
+        "type": "Agent",
+        "position": { "x": 520, "y": 280 }
+      },
+      {
+        "id": "OpenAIChat__mysql_test_05_llm",
+        "data": {
+          "name": "mysql_test_05_openai",
+          "credential_id": "",
+          "model_name": "gpt-4o",
+          "temperature": 0.1,
+          "max_tokens": 1500,
+          "_active_optional_fields": []
+        },
+        "type": "OpenAIChat",
+        "position": { "x": 430, "y": 520 }
+      },
+      {
+        "id": "MySQL__mysql_test_05_tool",
+        "data": {
+          "name": "mysql_test_05_readonly_tool",
+          "credential_id": "",
+          "connection_timeout_ms": 30000,
+          "tool_name": "mysql_read_only",
+          "access_profile": "read_only",
+          "allowed_tables": "customers,orders,products",
+          "max_rows": 200,
+          "_active_optional_fields": ["connection_timeout_ms", "tool_name", "allowed_tables", "max_rows"]
+        },
+        "type": "MySQLTool",
+        "position": { "x": 650, "y": 520 }
+      },
+      { "id": "EndNode__mysql_test_05_end", "data": { "name": "mysql_test_05_result" }, "type": "EndNode", "position": { "x": 860, "y": 280 } }
+    ],
+    "edges": [
+      { "id": "mysql-test-05-edge-1", "type": "custom", "source": "StartNode__mysql_test_05_start", "target": "Agent__mysql_test_05_agent", "sourceHandle": "output", "targetHandle": "input" },
+      { "id": "mysql-test-05-edge-2", "type": "custom", "source": "OpenAIChat__mysql_test_05_llm", "target": "Agent__mysql_test_05_agent", "sourceHandle": "llm", "targetHandle": "llm" },
+      { "id": "mysql-test-05-edge-3", "type": "custom", "source": "MySQL__mysql_test_05_tool", "target": "Agent__mysql_test_05_agent", "sourceHandle": "tool", "targetHandle": "tools" },
+      { "id": "mysql-test-05-edge-4", "type": "custom", "source": "Agent__mysql_test_05_agent", "target": "EndNode__mysql_test_05_end", "sourceHandle": "output", "targetHandle": "target" }
+    ]
+  }
+}

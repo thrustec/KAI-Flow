@@ -1,0 +1,82 @@
+{
+  "id": "mysql-test-06-agent-full-access",
+  "category": "ai-ml",
+  "created_at": "2026-07-29T00:00:00.000Z",
+  "name": "MySQL Test 06 - Full-access Agent Tool",
+  "description": "Tests the highest MySQL Tool permission profile against an explicit disposable-table allowlist. Select the same MySQL credential on Setup and Tool, plus an OpenAI credential. Do not point this template at production.",
+  "colorFrom": "from-red-700",
+  "colorTo": "to-purple-700",
+  "icon": { "name": "mysql", "path": "icons/mysql.svg", "alt": "MySQL" },
+  "flow_data": {
+    "nodes": [
+      { "id": "StartNode__mysql_test_06_start", "data": { "name": "start_mysql_agent_full" }, "type": "StartNode", "position": { "x": 40, "y": 280 } },
+      {
+        "id": "MySQL__mysql_test_06_setup",
+        "data": {
+          "name": "mysql_test_06_setup",
+          "credential_id": "",
+          "operation": "execute_query",
+          "query": "CREATE TABLE IF NOT EXISTS mysql_agent_full_test (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, task_name VARCHAR(160) NOT NULL UNIQUE, status VARCHAR(32) NOT NULL, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP); DELETE FROM mysql_agent_full_test; INSERT INTO mysql_agent_full_test (task_name,status) VALUES ('agent-demo','pending');",
+          "query_parameters": "[]",
+          "query_batching": "transaction",
+          "detailed_output": true,
+          "_active_optional_fields": ["query_batching", "detailed_output"]
+        },
+        "type": "MySQL",
+        "position": { "x": 260, "y": 280 }
+      },
+      {
+        "id": "Agent__mysql_test_06_agent",
+        "data": {
+          "name": "mysql_full_access_agent",
+          "agent_type": "react",
+          "user_prompt_template": "${{start_mysql_agent_full}}",
+          "system_prompt": "You are testing a full-access MySQL tool. Perform database changes only in the mysql_agent_full_test table. Use SHOW COLUMNS first. Follow the user's requested INSERT, UPDATE, SELECT, or DELETE, then SELECT the affected rows to verify the result. Never alter any other table.",
+          "max_iterations": 12,
+          "temperature": 0.1,
+          "enable_memory": false,
+          "enable_tools": true,
+          "_active_optional_fields": []
+        },
+        "type": "Agent",
+        "position": { "x": 540, "y": 280 }
+      },
+      {
+        "id": "OpenAIChat__mysql_test_06_llm",
+        "data": {
+          "name": "mysql_test_06_openai",
+          "credential_id": "",
+          "model_name": "gpt-4o",
+          "temperature": 0.1,
+          "max_tokens": 1800,
+          "_active_optional_fields": []
+        },
+        "type": "OpenAIChat",
+        "position": { "x": 450, "y": 540 }
+      },
+      {
+        "id": "MySQL__mysql_test_06_tool",
+        "data": {
+          "name": "mysql_test_06_full_tool",
+          "credential_id": "",
+          "connection_timeout_ms": 30000,
+          "tool_name": "mysql_full_access",
+          "access_profile": "full_admin",
+          "allowed_tables": "mysql_agent_full_test",
+          "max_rows": 200,
+          "_active_optional_fields": ["connection_timeout_ms", "tool_name", "allowed_tables", "max_rows"]
+        },
+        "type": "MySQLTool",
+        "position": { "x": 680, "y": 540 }
+      },
+      { "id": "EndNode__mysql_test_06_end", "data": { "name": "mysql_test_06_result" }, "type": "EndNode", "position": { "x": 880, "y": 280 } }
+    ],
+    "edges": [
+      { "id": "mysql-test-06-edge-1", "type": "custom", "source": "StartNode__mysql_test_06_start", "target": "MySQL__mysql_test_06_setup", "sourceHandle": "output", "targetHandle": "input" },
+      { "id": "mysql-test-06-edge-2", "type": "custom", "source": "MySQL__mysql_test_06_setup", "target": "Agent__mysql_test_06_agent", "sourceHandle": "output", "targetHandle": "input" },
+      { "id": "mysql-test-06-edge-3", "type": "custom", "source": "OpenAIChat__mysql_test_06_llm", "target": "Agent__mysql_test_06_agent", "sourceHandle": "llm", "targetHandle": "llm" },
+      { "id": "mysql-test-06-edge-4", "type": "custom", "source": "MySQL__mysql_test_06_tool", "target": "Agent__mysql_test_06_agent", "sourceHandle": "tool", "targetHandle": "tools" },
+      { "id": "mysql-test-06-edge-5", "type": "custom", "source": "Agent__mysql_test_06_agent", "target": "EndNode__mysql_test_06_end", "sourceHandle": "output", "targetHandle": "target" }
+    ]
+  }
+}
