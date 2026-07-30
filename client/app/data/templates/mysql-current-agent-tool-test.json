@@ -1,0 +1,115 @@
+{
+  "id": "mysql-current-agent-tool-test",
+  "category": "ai-ml",
+  "created_at": "2026-07-30T00:00:00.000Z",
+  "name": "MySQL Current Version - Agent Tool Test",
+  "description": "Tests the separate MySQL Tool node with Agent.tools, a read-only permission profile, table allowlisting, row limiting, and write rejection. Select MySQL and OpenAI credentials before chatting.",
+  "colorFrom": "from-purple-600",
+  "colorTo": "to-cyan-700",
+  "icon": { "name": "mysql", "path": "icons/mysql.svg", "alt": "MySQL" },
+  "flow_data": {
+    "nodes": [
+      {
+        "id": "StickyNoteNode__mysql_current_agent_overview",
+        "type": "StickyNoteNode",
+        "position": { "x": 60, "y": 40 },
+        "width": 410,
+        "height": 190,
+        "style": { "width": 410, "height": 190 },
+        "data": {
+          "name": "mysql_agent_overview_note",
+          "colorIndex": 0,
+          "text": "# MySQL Tool + Agent\n\nBu workflow normal MySQL node'unu değil, yalnız **tool** çıkışı bulunan **MySQL Tool** node'unu test eder. Tool çıkışı Agent'ın `tools` girişine bağlıdır."
+        }
+      },
+      {
+        "id": "StickyNoteNode__mysql_current_agent_credentials",
+        "type": "StickyNoteNode",
+        "position": { "x": 510, "y": 40 },
+        "width": 420,
+        "height": 210,
+        "style": { "width": 420, "height": 210 },
+        "data": {
+          "name": "mysql_agent_credentials_note",
+          "colorIndex": 6,
+          "text": "# Gerekli Ayarlar\n\n1. OpenAI Chat node'unda bir LLM credential seçin.\n2. MySQL Tool node'unda MySQL credential seçin.\n3. Docker örnek veritabanında `customers`, `orders` ve `products` tabloları hazırdır."
+        }
+      },
+      {
+        "id": "StickyNoteNode__mysql_current_agent_prompts",
+        "type": "StickyNoteNode",
+        "position": { "x": 970, "y": 40 },
+        "width": 520,
+        "height": 250,
+        "style": { "width": 520, "height": 250 },
+        "data": {
+          "name": "mysql_agent_prompts_note",
+          "colorIndex": 2,
+          "text": "# Sohbette Deneyin\n\n- `customers tablosundaki ilk 5 müşterinin isim ve e-posta bilgilerini getir.`\n- `orders tablosundaki sipariş sayılarını durumlara göre grupla.`\n- `customers tablosundaki tüm kayıtları sil.`\n\nİlk iki istek veritabanından okunmalıdır. Son istek **read_only** profili nedeniyle reddedilmelidir."
+        }
+      },
+      {
+        "id": "StartNode__mysql_current_agent_start",
+        "type": "StartNode",
+        "position": { "x": 170, "y": 390 },
+        "data": { "name": "start_mysql_current_agent" }
+      },
+      {
+        "id": "Agent__mysql_current_agent",
+        "type": "Agent",
+        "position": { "x": 620, "y": 390 },
+        "data": {
+          "name": "mysql_current_readonly_agent",
+          "agent_type": "react",
+          "user_prompt_template": "${{input}}",
+          "system_prompt": "You are a MySQL database assistant. For database questions, always call the connected mysql_read_only tool. You may query only customers, orders, and products. Use SELECT statements, return concise Turkish answers, and never invent database results. If a write request is rejected by the tool, clearly explain that the read-only permission profile blocked it.",
+          "max_iterations": 10,
+          "temperature": 0.1,
+          "enable_memory": false,
+          "enable_tools": true,
+          "_active_optional_fields": []
+        }
+      },
+      {
+        "id": "OpenAIChat__mysql_current_agent_llm",
+        "type": "OpenAIChat",
+        "position": { "x": 470, "y": 650 },
+        "data": {
+          "name": "mysql_current_agent_openai",
+          "credential_id": "",
+          "model_name": "gpt-4o",
+          "temperature": 0.1,
+          "max_tokens": 1500,
+          "_active_optional_fields": []
+        }
+      },
+      {
+        "id": "MySQLTool__mysql_current_agent_tool",
+        "type": "MySQLTool",
+        "position": { "x": 760, "y": 650 },
+        "data": {
+          "name": "mysql_current_readonly_tool",
+          "credential_id": "",
+          "access_profile": "read_only",
+          "allowed_tables": "customers,orders,products",
+          "max_rows": 100,
+          "tool_name": "mysql_read_only",
+          "connection_timeout_ms": 30000,
+          "_active_optional_fields": ["allowed_tables", "max_rows", "tool_name", "connection_timeout_ms"]
+        }
+      },
+      {
+        "id": "EndNode__mysql_current_agent_end",
+        "type": "EndNode",
+        "position": { "x": 1070, "y": 390 },
+        "data": { "name": "mysql_current_agent_result" }
+      }
+    ],
+    "edges": [
+      { "id": "mysql-current-agent-edge-1", "type": "custom", "source": "StartNode__mysql_current_agent_start", "target": "Agent__mysql_current_agent", "sourceHandle": "output", "targetHandle": "input" },
+      { "id": "mysql-current-agent-edge-2", "type": "custom", "source": "OpenAIChat__mysql_current_agent_llm", "target": "Agent__mysql_current_agent", "sourceHandle": "llm", "targetHandle": "llm" },
+      { "id": "mysql-current-agent-edge-3", "type": "custom", "source": "MySQLTool__mysql_current_agent_tool", "target": "Agent__mysql_current_agent", "sourceHandle": "tool", "targetHandle": "tools" },
+      { "id": "mysql-current-agent-edge-4", "type": "custom", "source": "Agent__mysql_current_agent", "target": "EndNode__mysql_current_agent_end", "sourceHandle": "output", "targetHandle": "target" }
+    ]
+  }
+}
