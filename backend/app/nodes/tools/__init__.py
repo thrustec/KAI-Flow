@@ -12,6 +12,7 @@ from .markitdown_tool import MarkItDownToolNode
 from .postgres_tool import PostgresToolNode
 from .mysql_tool import MySQLToolNode
 from .scrapling_tool import ScraplingToolNode
+from .model_security_tool import ModelSecurityToolNode
 
 __all__ = [
     "HttpClientNode",
@@ -23,5 +24,6 @@ __all__ = [
     "MarkItDownToolNode",
     "PostgresToolNode",
     "MySQLToolNode",
-    "ScraplingToolNode"
+    "ScraplingToolNode",
+    "ModelSecurityToolNode",
 ]
