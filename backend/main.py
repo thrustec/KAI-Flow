@@ -64,6 +64,7 @@ from app.api.external_workflows import router as external_workflows_router
 from app.api.export import router as export_router
 from app.nodes.triggers.kafka_trigger import kafka_router as kafka_trigger_router
 from app.api.logs import router as logs_router
+from app.api.sqlite import sqlite_router
 
 logger = logging.getLogger(__name__)
 
@@ -259,6 +260,7 @@ app.include_router(documents_router, prefix=f"/{API_START}/{API_VERSION}/documen
 app.include_router(scheduled_jobs_router, prefix=f"/{API_START}/{API_VERSION}/jobs/scheduled", tags=["Scheduled Jobs"])
 app.include_router(vectors_router, prefix=f"/{API_START}/{API_VERSION}/vectors", tags=["Vector Storage"])
 app.include_router(logs_router, prefix=f"/{API_START}/{API_VERSION}/logs", tags=["Logs"])
+app.include_router(sqlite_router, prefix=f"/{API_START}/{API_VERSION}", tags=["SQLite"])
 app.include_router(model_artifacts_router, prefix=f"/{API_START}/{API_VERSION}/model-artifacts", tags=["Model Artifacts"])
 
 # Include Timers router (both versioned and unversioned to match frontend API calls)

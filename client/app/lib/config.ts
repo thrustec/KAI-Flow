@@ -83,6 +83,10 @@ export const API_ENDPOINTS = {
     MODELS: (id: string) => `/credentials/${id}/models`,
     LIST_MODELS: '/credentials/list-models',
   },
+  SQLITE: {
+    TABLES: '/sqlite/tables',
+    COLUMNS: '/sqlite/columns',
+  },
   API_KEYS: {
     LIST: '/api-keys',
     CREATE: '/api-keys',
